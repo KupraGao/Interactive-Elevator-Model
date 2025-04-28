@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+        integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        font-size: 1.3rem;
+    }
+
+    body {
+        background-color: #101010;
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .elevator {
+        position: absolute;
+        bottom: 0;
+        right: 400px;
+        height: 100px;
+        width: 80px;
+        background-color: lime;
+        z-index: 10;
+    }
+
+    .left-door,
+    .right-door {
+        position: absolute;
+        width: 0;
+        height: 100px;
+        background-color: green;
+        z-index: 11;
+        transition: 1s ease-in-out;
+    }
+
+    .left-door {
+        left: 0;
+        border-right: 5px solid darkgreen;
+    }
+
+    .right-door {
+        right: 0;
+        border-left: 5px solid darkgreen;
+    }
+
+    .floor-btns {
+        display: flex;
+        position: absolute;
+        left: 400px;
+        gap: 20px;
+    }
+
+    .row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .row i {
+        font-size: 1rem;
+    }
+
+    .row1 {
+        flex-direction: column-reverse;
+    }
+
+    .row2 {
+        flex-direction: column;
+    }
+
+    .btns,
+    .sidebtns {
+        border-radius: 50%;
+        height: 60px;
+        width: 60px;
+        background-color: #252525;
+        border: 2px solid lime;
+        box-shadow: 0 0 15px lime;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btns:hover,
+    .sidebtns:hover {
+        box-shadow: 0 0 25px lime,
+            0 0 50px lime;
+        transform: scale(1.1);
+    }
+
+    .btns:active,
+    .sidebtns:active {
+        box-shadow: 0 0 15px black;
+        transform: scale(1);
+    }
+
+    .background {
+        position: absolute;
+        right: 155px;   
+        bottom: 0;
+        height: 100%;
+        width: 80px;
+        background-color: #303030;
+        z-index: 9;
+    }
+
+    .block {
+        position: absolute;
+        right: 240px;
+        bottom: 0;
+        width: 400px;
+        height: 605px;
+        border-left: 5px solid black;
+        border-right: 5px solid black;
+        border-top: 5px solid black;
+        background-color: #303030;
+        box-shadow: 0 0 10px 1px lime;
+    }
+
+    .rail1 {
+        position: absolute;
+        right: 205px;
+        width: 8px;
+        height: 100%;
+        background-color: black;
+        z-index: 9;
+    }
+
+    .rail2 {
+        position: absolute;
+        left: 205px;
+        width: 8px;
+        height: 100%;
+        background-color: black;
+        z-index: 9;
+    }
+
+    .floor1,
+    .floor2,
+    .floor3,
+    .floor4,
+    .floor5 {
+        position: absolute;
+        height: 5px;
+        width: 100%;
+        background-color: black;
+        z-index: 9;
+    }
+
+    .floor1 {
+        bottom: 100px;
+    }
+
+    .floor2 {
+        bottom: 200px;
+    }
+
+    .floor3 {
+        bottom: 300px;
+    }
+
+    .floor4 {
+        bottom: 400px;
+    }
+
+    .floor5 {
+        bottom: 500px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="floor-btns">
+            <div class="row1 row">
+                <button id="goingUp" class="sidebtns"><i class="fa-solid fa-angles-up"></i></button>
+                <button id="unlockDoors" class="sidebtns"><i class="fa-solid fa-unlock"></i></button>
+                <button class="btn0 btns">0</button>
+                <button class="btn1 btns">1</button>
+                <button class="btn2 btns">2</button>
+            </div>
+            <div class="row2 row">
+                <button class="btn3 btns">3</button>
+                <button class="btn4 btns">4</button>
+                <button class="btn5 btns">5</button>
+                <button id="lockDoors" class="sidebtns"><i class="fa-solid fa-lock"></i></button>
+                <button id="goingDown" class="sidebtns"><i class="fa-solid fa-angles-down"></i></button>
+            </div>
+        </div>
+
+
+        <div class="block">
+            <div class="floor1"></div>
+            <div class="floor2"></div>
+            <div class="floor3"></div>
+            <div class="floor4"></div>
+            <div class="floor5"></div>
+            <div class="background"></div>
+            <div class="rail1"></div>
+            <div class="rail2"></div>
+        </div>
+
+        <div class="elevator">
+            <div class="left-door"></div>
+            <div class="right-door"></div>
+        </div>
+    </div>
+    <script>
+        const btns = document.querySelectorAll(".btns");
+        const elevator = document.querySelector(".elevator");
+        const leftDoor = document.querySelector(".left-door");
+        const rightDoor = document.querySelector(".right-door")
+        const unlockDoors = document.getElementById("unlockDoors")
+        const lockDoors = document.getElementById("lockDoors")
+        const goingUp = document.getElementById("goingUp")
+        const goingDown = document.getElementById("goingDown")
+        let queue = [];
+        let isMoving = false;
+        let currentFloor = 0;
+
+        function toggleDoorButtons(state) {
+            unlockDoors.disabled = state;
+            lockDoors.disabled = state;
+        }
+
+        btns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const floor = parseInt(btn.innerHTML);
+                queue.push(floor);
+                if (!isMoving) {
+                    processQueue();
+                }
+            });
+        });
+
+        function processQueue() {
+            if (queue.length === 0) {
+                isMoving = false;
+                goingUp.style.color = "";
+                goingUp.style.textShadow = ""
+                goingDown.style.color = "";
+                goingDown.style.textShadow = ""
+                return;
+            }
+
+            isMoving = true;
+            toggleDoorButtons(true);
+            const nextFloor = queue.shift();
+            let distance = Math.abs(nextFloor - currentFloor);
+            closeDoors();
+            setTimeout(() => {
+                const previousFloor = currentFloor;
+                currentFloor = nextFloor;
+                elevator.style.bottom = `${currentFloor * 100}px`;
+                elevator.style.transition = `${distance}s ease-in-out`;
+
+                if (currentFloor > previousFloor) {
+                    goingUp.style.color = "lime";
+                    goingUp.style.textShadow = "0 0 15px"
+                    goingDown.style.color = "";
+                    goingDown.style.textShadow = ""
+                } else if (currentFloor < previousFloor) {
+                    goingDown.style.color = "lime";
+                    goingDown.style.textShadow = "0 0 15px"
+                    goingUp.style.color = "";
+                    goingUp.style.textShadow = ""
+                }
+
+                setTimeout(() => {
+                    openDoors();
+                    setTimeout(() => {
+                        toggleDoorButtons(false);
+                        processQueue();
+                    }, 2000);
+                }, distance * 1000);
+            }, 1000);
+        }
+
+        unlockDoors.onclick = function () {
+            if (!isMoving) {
+                openDoors();
+            }
+        };
+
+        lockDoors.onclick = function () {
+            if (!isMoving) {
+                closeDoors();
+            }
+        };
+
+        function closeDoors() {
+            leftDoor.style.width = "40px";
+            rightDoor.style.width = "40px";
+        }
+
+        function openDoors() {
+            leftDoor.style.width = "0";
+            rightDoor.style.width = "0";
+        }
+    </script>
+</body>
+
+</html>
